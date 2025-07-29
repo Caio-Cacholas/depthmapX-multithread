@@ -17,7 +17,11 @@
 
 #include <QWidget>
 #include <QSpinBox>
+#include "depthmapX/settings.h"
+#include "depthmapX/settingsimpl.h"
 #include "thread_globals.h"
+//#include "salalib/segmmodules/segmtopological.h"
+//#include "salalib/segmmodules/segmtulip.h"
 #include "settingspage.h"
 #include <iostream>
 
