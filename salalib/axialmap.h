@@ -19,6 +19,7 @@
 
 #include "salalib/spacepixfile.h"
 #include "salalib/spacepix.h"
+#include "depthmapX/thread_globals.h"
 #include "salalib/connector.h"
 
 struct AxialVertex;
