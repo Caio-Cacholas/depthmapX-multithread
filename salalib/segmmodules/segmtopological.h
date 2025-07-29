@@ -19,7 +19,7 @@
 #pragma once
 
 #include "salalib/segmmodules/segmhelpers.h"
-
+#include "depthmapX/thread_globals.h"
 #include "salalib/isegment.h"
 
 class SegmentTopological : ISegment {
@@ -30,5 +30,6 @@ class SegmentTopological : ISegment {
   public:
     std::string getAnalysisName() const override { return "Topological Analysis"; }
     bool run(Communicator *comm, ShapeGraph &map, bool) override;
+    //static int num_threads;  // Valor default
     SegmentTopological(double radius, bool sel_only) : m_radius(radius), m_sel_only(sel_only) {}
 };
