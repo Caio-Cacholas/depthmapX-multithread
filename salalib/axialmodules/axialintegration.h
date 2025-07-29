@@ -19,6 +19,7 @@
 #pragma once
 
 #include "salalib/iaxial.h"
+#include "depthmapX/thread_globals.h"
 
 class AxialIntegration : IAxial {
   private:
