@@ -28,6 +28,7 @@ set(salalib_SRCS
     mapconverter.cpp
     importutils.cpp
     attributetableindex.cpp
+    ../depthmapX/thread_globals.cpp
     ianalysis.h)
 
 add_compile_definitions(_DEPTHMAP SALALIB_LIBRARY)
