@@ -16,6 +16,7 @@
 #include <QtWidgets>
 
 #include "settingsdialog.h"
+#include "thread_globals.h"
 #include "generalpage.h"
 #include "interfacepage.h"
 
@@ -74,9 +75,13 @@ void SettingsDialog::saveChanges() {
     {
         (*iter)->writeSettings(m_settings);
     }
+    SettingsImpl appSettings(new DefaultSettingsFactory());
+
+    num_threadsGlobal = appSettings.readSetting(SettingTag::numThreads, 1).toInt();
 }
 
 void SettingsDialog::saveChangesAndClose() {
+
     saveChanges();
     QDialog::accept();
 }
