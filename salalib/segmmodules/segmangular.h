@@ -19,6 +19,7 @@
 #pragma once
 
 #include "salalib/isegment.h"
+#include "depthmapX/thread_globals.h"
 
 class SegmentAngular : ISegment {
   private:
