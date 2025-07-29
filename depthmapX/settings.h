@@ -37,6 +37,7 @@ namespace SettingTag
     const QString depthmapViewSize = "depthmapViewSize";
     const QString legacyMapWindow = "legacyMapWindow";
     const QString highlightOnHover = "highlightOnHover";
+    const QString numThreads = "numThreads";
 }
 
 /**
