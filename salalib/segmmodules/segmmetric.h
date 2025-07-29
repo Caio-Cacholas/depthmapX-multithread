@@ -19,7 +19,7 @@
 #pragma once
 
 #include "salalib/segmmodules/segmhelpers.h"
-
+#include "depthmapX/thread_globals.h"
 #include "salalib/isegment.h"
 
 class SegmentMetric : ISegment {
