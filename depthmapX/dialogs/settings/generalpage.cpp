@@ -27,8 +27,25 @@ GeneralPage::GeneralPage(Settings &settings, QWidget *parent)
     simpleModeCheckBox->setChecked(m_simpleVersion);
     connect(simpleModeCheckBox, &QCheckBox::stateChanged, [=] () {m_simpleVersion = !m_simpleVersion;});
 
+    // --- Novo: SpinBox para threads ---
+    QLabel *labelThreads = new QLabel(tr("Number of threads:"));
+    m_spinThreads = new QSpinBox;
+    m_spinThreads->setMinimum(1);
+    m_spinThreads->setMaximum(256); //Limite arbitrário
+    //m_spinThreads->setValue(settings.readSetting(SettingTag::numThreads, 1).toInt());
+
+    // Leia o valor salvo no settings
+    int threads = settings.readSetting(SettingTag::numThreads, 1).toInt();
+    m_spinThreads->setValue(threads);
+    num_threadsGlobal = threads;
+
     QVBoxLayout *configLayout = new QVBoxLayout;
     configLayout->addWidget(simpleModeCheckBox);
+
+    // Adicione aqui:
+    configLayout->addWidget(labelThreads);
+    configLayout->addWidget(m_spinThreads);
+    
     configGroup->setLayout(configLayout);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
