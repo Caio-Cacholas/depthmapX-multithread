@@ -16,19 +16,30 @@
 #pragma once
 
 #include <QWidget>
+#include <QSpinBox>
+#include "thread_globals.h"
 #include "settingspage.h"
 #include <iostream>
 
 class GeneralPage : public SettingsPage
 {
 private:
-    bool m_simpleVersion = false;    
+    bool m_simpleVersion = false;
+    QSpinBox *m_spinThreads = nullptr;
     void readSettings(Settings &settings) {
         m_simpleVersion = settings.readSetting(SettingTag::simpleVersion, true).toBool();
+        // Lê o valor de numThreads, default = 1
+        int threads = settings.readSetting(SettingTag::numThreads, 1).toInt();
+        if (m_spinThreads) m_spinThreads->setValue(threads);
+        num_threadsGlobal = settings.readSetting(SettingTag::numThreads, 1).toInt();
+
     }
 public:
     GeneralPage(Settings &settings, QWidget *parent = 0);
     virtual void writeSettings(Settings &settings) override {
         settings.writeSetting(SettingTag::simpleVersion, m_simpleVersion);
+        // Salva o valor do spinbox (se já estiver inicializado)
+        if (m_spinThreads) settings.writeSetting(SettingTag::numThreads, m_spinThreads->value());
+
     }
 };
