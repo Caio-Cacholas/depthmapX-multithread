@@ -1,3 +1,5 @@
+This is a simple and experimental implementation of multithreaded support for some analysis operations. It is not fully tested and may contain bugs or unstable behavior. Use it at your own risk and feel free to contribute improvements.
+
 ## depthmapX - multi-platform spatial network analyses software
 
 
