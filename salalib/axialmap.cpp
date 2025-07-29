@@ -21,6 +21,7 @@
 #include "salalib/axialmap.h"
 #include "salalib/alllinemap.h"
 #include "salalib/tolerances.h"
+#include <thread>
 #include "salalib/pointdata.h"   // need the pointdata for the convert boundary graph to axial map routine
 #include "salalib/ngraph.h"      // ditto ngraph
 #include "salalib/parsers/mapinfodata.h"
@@ -58,36 +59,68 @@ void ShapeGraph::initialiseAttributesAxial()
 
 }
 
-void ShapeGraph::makeConnections(const KeyVertices &keyvertices)
+void ShapeGraph::makeConnections(const KeyVertices& keyvertices)
 {
-   m_connectors.clear();
-   m_links.clear();
-   m_unlinks.clear();
-   m_keyvertices.clear();
+    m_connectors.clear();
+    m_links.clear();
+    m_unlinks.clear();
+    m_keyvertices.clear();
 
-   // note, expects these to be numbered 0, 1...
-   int conn_col = m_attributes->getColumnIndex("Connectivity");
-   int leng_col = m_attributes->getColumnIndex("Line Length");
+    int conn_col = m_attributes->getColumnIndex("Connectivity");
+    int leng_col = m_attributes->getColumnIndex("Line Length");
 
-   int i = -1;
-   for (auto shape: m_shapes) {
-      i++;
-      int key = shape.first;
-      AttributeRow &row =
-          m_attributes->getRow(AttributeKey(key));
-      // all indices should match...
-      m_connectors.push_back( Connector() );
-      m_connectors[i].m_connections = getLineConnections( key, TOLERANCE_B*__max(m_region.height(),m_region.width()));
-      row.setValue(conn_col, float(m_connectors[i].m_connections.size()) );
-      row.setValue(leng_col, float(shape.second.getLine().length()) );
-      if (keyvertices.size()) {
-         // note: depends on lines being recorded in same order as keyvertices...
-         m_keyvertices.push_back( keyvertices[i] );
-      }
-   }
+    size_t n = m_shapes.size();
+    m_connectors.resize(n);
 
-   m_displayed_attribute = -1; // <- override if it's already showing
-   setDisplayedAttribute(conn_col);
+    int num_threads = num_threadsGlobal;
+    if (num_threads <= 0) num_threads = 1;
+    unsigned int max_threads = std::thread::hardware_concurrency();
+    if (max_threads == 0) max_threads = 1;
+    if (num_threads > static_cast<int>(max_threads)) num_threads = static_cast<int>(max_threads);
+    size_t chunk = (n + num_threads - 1) / num_threads;
+
+    // Para preservar a ordem dos keyvertices
+    KeyVertices keyvertices_temp; // geralmente std::vector<std::set<int>>, igual ao tipo da função
+    if (!keyvertices.empty()) {
+        keyvertices_temp.resize(n);
+    }
+
+    // Lambda de processamento paralelo
+    auto worker = [&](size_t start, size_t end) {
+        for (size_t i = start; i < end && i < n; ++i) {
+            auto iter = std::next(m_shapes.begin(), i);
+            int key = iter->first;
+            AttributeRow& row = m_attributes->getRow(AttributeKey(key));
+
+            double tolerance = TOLERANCE_B * std::max(m_region.height(), m_region.width());
+            m_connectors[i] = Connector();
+            m_connectors[i].m_connections = getLineConnections(key, tolerance);
+
+            row.setValue(conn_col, float(m_connectors[i].m_connections.size()));
+            row.setValue(leng_col, float(iter->second.getLine().length()));
+
+            // Preenche temporariamente os keyvertices se necessário
+            if (!keyvertices.empty()) {
+                keyvertices_temp[i] = keyvertices[i];
+            }
+        }
+        };
+
+    std::vector<std::thread> threads;
+    for (unsigned int t = 0; t < num_threads; ++t) {
+        size_t start = t * chunk;
+        size_t end = std::min(n, (t + 1) * chunk);
+        threads.emplace_back(worker, start, end);
+    }
+    for (auto& th : threads) th.join();
+
+    // Após o processamento paralelo, preenche m_keyvertices na ordem correta
+    if (!keyvertices.empty()) {
+        m_keyvertices = std::move(keyvertices_temp);
+    }
+
+    m_displayed_attribute = -1; // <- override if it's already showing
+    setDisplayedAttribute(conn_col);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
