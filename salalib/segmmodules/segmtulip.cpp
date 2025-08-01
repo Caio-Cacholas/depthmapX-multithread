@@ -585,7 +585,6 @@ bool SegmentTulip::run(Communicator* comm, ShapeGraph& map, bool) {
             }
         }
     }
-    // (Atualize também as outras colunas como integração, total depth, etc. igual ao seu código)
 
     map.setDisplayedAttribute(-2);
     if (m_choice) map.setDisplayedAttribute(choice_col.back());
