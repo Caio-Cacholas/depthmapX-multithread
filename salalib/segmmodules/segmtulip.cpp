@@ -484,7 +484,7 @@ bool SegmentTulip::run(Communicator* comm, ShapeGraph& map, bool) {
             }
 
             // --- 4. Backward: calcula o choice desta origem acumulando em local_choice ---
-            // (O backward_worker é incorporado direto aqui, mas você pode chamar uma função se preferir)
+            // (O backward_worker é incorporado direto aqui)
             std::vector<std::vector<std::array<std::unordered_set<size_t>, 2>>> local_choicecovered(
                 n, std::vector<std::array<std::unordered_set<size_t>, 2>>(radiussize)
             );
@@ -531,7 +531,7 @@ bool SegmentTulip::run(Communicator* comm, ShapeGraph& map, bool) {
                 }
             }
 
-            // --- 5. Barra de progresso (opcional, pode remover para benchmark real) ---
+            // --- 5. Barra de progresso (opcional) ---
             size_t value = ++global_processed_rows;
             if (comm) {
                 if (qtimer(atime, 500)) {
@@ -539,7 +539,7 @@ bool SegmentTulip::run(Communicator* comm, ShapeGraph& map, bool) {
                     comm->CommPostMessage(Communicator::CURRENT_RECORD, value);
                 }
             }
-        } // (fim do loop de origin)
+        } 
         };
 
     // --- Threading: cada thread processa seu chunk, armazena resultado no seu buffer local ---
@@ -552,7 +552,7 @@ bool SegmentTulip::run(Communicator* comm, ShapeGraph& map, bool) {
     }
     for (auto& th : threads) th.join();
 
-    // --- Redução Final: soma tudo em global_choice (sem lock, agora é rápido) ---
+    // --- Redução Final: soma tudo em global_choice (sem lock) ---
     std::vector<std::vector<std::array<ChoiceAccum, 2>>> global_choice(
         n, std::vector<std::array<ChoiceAccum, 2>>(radiussize)
     );
